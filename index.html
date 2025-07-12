@@ -1,0 +1,3150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Information Storage & Retrieval Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-title {
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quiz-progress {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 1.1rem;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next.enabled {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .btn-next.enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-quit {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-quit:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+        }
+
+        .results {
+            text-align: center;
+            display: none;
+        }
+
+        .results h2 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-details {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .quiz-title {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .option {
+                font-size: 1rem;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">TOC Quiz - Supplementary study material prepared by Prof. Rahul M. Samant</h1>
+            <div class="quiz-progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div id="quizContent">
+            <div class="question-card">
+                <div class="question-number" id="questionNumber">Question 1 of 20</div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options-container" id="optionsContainer"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-quit" onclick="quitQuiz()">Quit</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Quiz Complete!</h2>
+            <div class="score" id="finalScore"></div>
+            <div class="score-details" id="scoreDetails"></div>
+            <button class="btn btn-restart" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+           
+{
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It accepts regular languages",
+      "It can have non-determinism",
+      "It has multiple initial states"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It accepts only context-free languages",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Neither",
+      "Both DFA and NFA",
+      "DFA only",
+      "NFA only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Input only",
+      "Previous input",
+      "State only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Both state and input",
+      "Next state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Regular languages",
+      "Context-free languages",
+      "Recursive languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only DFA",
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only PDA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Language translation",
+      "Halting problem",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It accepts regular languages",
+      "It can have non-determinism"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Neither",
+      "NFA only",
+      "Both DFA and NFA",
+      "DFA only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Previous input",
+      "Input only",
+      "Both state and input",
+      "State only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Input only",
+      "Next state",
+      "Both state and input"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Regular languages",
+      "Recursive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only DFA",
+      "Only context-sensitive grammars",
+      "Only PDA",
+      "Any computational model"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Language translation",
+      "Halting problem",
+      "Memory management",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA",
+      "It has a finite grammar"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It accepts regular languages",
+      "It can have epsilon transitions",
+      "It can have non-determinism",
+      "It has multiple initial states"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton",
+      "Dual Finite Automaton"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "Both DFA and NFA",
+      "NFA only",
+      "Neither"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Previous input",
+      "State only",
+      "Both state and input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Both state and input",
+      "State only",
+      "Next state"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-free languages",
+      "Context-sensitive languages",
+      "Regular languages",
+      "Recursive languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only PDA",
+      "Only DFA",
+      "Any computational model"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Language translation",
+      "Halting problem",
+      "Memory management",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA",
+      "It has a finite grammar",
+      "It has an infinite state"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have non-determinism",
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It accepts only context-free languages",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Neither",
+      "NFA only",
+      "Both DFA and NFA",
+      "DFA only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Previous input",
+      "Both state and input",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Next state",
+      "State only",
+      "Both state and input"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Regular languages",
+      "Recursive languages",
+      "Context-free languages",
+      "Context-sensitive languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only PDA",
+      "Any computational model",
+      "Only DFA",
+      "Only context-sensitive grammars"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Language translation",
+      "Memory management",
+      "Halting problem",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It can be solved using a DFA",
+      "It has an infinite state",
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It can have non-determinism",
+      "It accepts regular languages",
+      "It can have epsilon transitions"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Deterministic Finite Automaton",
+      "Definite Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Neither",
+      "Both DFA and NFA",
+      "NFA only",
+      "DFA only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Previous input",
+      "Both state and input",
+      "State only",
+      "Input only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Both state and input",
+      "Next state",
+      "State only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Regular languages",
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only DFA",
+      "Any computational model",
+      "Only context-sensitive grammars",
+      "Only PDA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Halting problem",
+      "Efficiency of algorithms",
+      "Language translation"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA",
+      "It has an infinite state"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It accepts regular languages",
+      "It can have non-determinism",
+      "It can have epsilon transitions",
+      "It has multiple initial states"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton",
+      "Dual Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "Both DFA and NFA",
+      "DFA only",
+      "Neither"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Both state and input",
+      "Input only",
+      "Previous input"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Both state and input",
+      "Next state",
+      "State only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Context-free languages",
+      "Regular languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only DFA",
+      "Only PDA",
+      "Any computational model"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Halting problem",
+      "Efficiency of algorithms",
+      "Memory management",
+      "Language translation"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA",
+      "It has an infinite state"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It accepts regular languages",
+      "It can have non-determinism",
+      "It can have epsilon transitions",
+      "It has multiple initial states"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Definite Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Deterministic Finite Automaton"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA",
+      "It cannot have epsilon transitions"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "NFA only",
+      "Neither",
+      "Both DFA and NFA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Previous input",
+      "State only",
+      "Both state and input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Next state",
+      "Both state and input"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Regular languages",
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only DFA",
+      "Only PDA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Language translation",
+      "Halting problem",
+      "Memory management",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state",
+      "It has a finite grammar",
+      "It can be solved using a DFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It has multiple initial states",
+      "It accepts regular languages",
+      "It can have non-determinism"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "DFA only",
+      "Neither",
+      "Both DFA and NFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Previous input",
+      "Both state and input",
+      "State only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Both state and input",
+      "Next state",
+      "Input only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Context-free languages",
+      "Regular languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only PDA",
+      "Only DFA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Efficiency of algorithms",
+      "Halting problem",
+      "Language translation"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state",
+      "It can be solved using a DFA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It has multiple initial states",
+      "It accepts regular languages",
+      "It can have non-determinism"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It always has a unique transition for each input",
+      "It is equivalent in power to DFA",
+      "It cannot have epsilon transitions",
+      "It accepts only context-free languages"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Neither",
+      "Both DFA and NFA",
+      "DFA only",
+      "NFA only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Input only",
+      "State only",
+      "Previous input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Both state and input",
+      "Next state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Recursive languages",
+      "Context-free languages",
+      "Context-sensitive languages",
+      "Regular languages"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only DFA",
+      "Only PDA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Language translation",
+      "Efficiency of algorithms",
+      "Halting problem",
+      "Memory management"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has a finite grammar",
+      "It has an infinite state"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It accepts regular languages",
+      "It has multiple initial states",
+      "It can have non-determinism"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Discrete Finite Automaton",
+      "Dual Finite Automaton",
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "DFA only",
+      "Neither",
+      "Both DFA and NFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "State only",
+      "Input only",
+      "Previous input"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Next state",
+      "Both state and input",
+      "Input only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Recursive languages",
+      "Regular languages",
+      "Context-sensitive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only DFA",
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only PDA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Language translation",
+      "Halting problem",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state",
+      "It can be solved using a DFA",
+      "It has a finite grammar"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It accepts regular languages",
+      "It has multiple initial states",
+      "It can have non-determinism"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Definite Finite Automaton",
+      "Discrete Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It accepts only context-free languages",
+      "It cannot have epsilon transitions",
+      "It always has a unique transition for each input"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "Neither",
+      "Both DFA and NFA",
+      "NFA only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Previous input",
+      "Both state and input"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Next state",
+      "Input only",
+      "State only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-free languages",
+      "Recursive languages",
+      "Regular languages",
+      "Context-sensitive languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only PDA",
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Halting problem",
+      "Memory management",
+      "Language translation",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "It has an infinite state",
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It can have non-determinism",
+      "It accepts regular languages",
+      "It can have epsilon transitions"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Definite Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It cannot have epsilon transitions",
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "DFA only",
+      "Neither",
+      "Both DFA and NFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Previous input",
+      "Both state and input",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Next state",
+      "State only",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Regular languages",
+      "Context-free languages",
+      "Recursive languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only DFA",
+      "Any computational model",
+      "Only context-sensitive grammars",
+      "Only PDA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Efficiency of algorithms",
+      "Language translation",
+      "Halting problem",
+      "Memory management"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA",
+      "It has a finite grammar"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It can have non-determinism",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Discrete Finite Automaton",
+      "Dual Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "DFA only",
+      "Neither",
+      "Both DFA and NFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Previous input",
+      "State only",
+      "Input only",
+      "Both state and input"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Both state and input",
+      "Next state",
+      "Input only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Context-free languages",
+      "Regular languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only DFA",
+      "Any computational model",
+      "Only PDA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Halting problem",
+      "Memory management",
+      "Efficiency of algorithms",
+      "Language translation"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has a finite grammar",
+      "It can be solved using a DFA"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It can have non-determinism",
+      "It has multiple initial states",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Both DFA and NFA",
+      "DFA only",
+      "Neither",
+      "NFA only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Previous input",
+      "Input only",
+      "State only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Next state",
+      "Both state and input",
+      "Input only",
+      "State only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Context-free languages",
+      "Recursive languages",
+      "Regular languages"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Any computational model",
+      "Only DFA",
+      "Only PDA",
+      "Only context-sensitive grammars"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Efficiency of algorithms",
+      "Memory management",
+      "Language translation",
+      "Halting problem"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It accepts regular languages",
+      "It can have non-determinism",
+      "It can have epsilon transitions"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions",
+      "It accepts only context-free languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "Neither",
+      "Both DFA and NFA",
+      "DFA only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Both state and input",
+      "Previous input",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Next state",
+      "Both state and input"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Recursive languages",
+      "Context-sensitive languages",
+      "Regular languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only DFA",
+      "Only PDA",
+      "Any computational model"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Halting problem",
+      "Efficiency of algorithms",
+      "Language translation"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "It can be solved using a DFA",
+      "It has an infinite state",
+      "There exists a Turing Machine that halts on all inputs"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have non-determinism",
+      "It can have epsilon transitions",
+      "It has multiple initial states",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Definite Finite Automaton",
+      "Discrete Finite Automaton",
+      "Dual Finite Automaton",
+      "Deterministic Finite Automaton"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions",
+      "It accepts only context-free languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Both DFA and NFA",
+      "NFA only",
+      "DFA only",
+      "Neither"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Input only",
+      "State only",
+      "Previous input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Both state and input",
+      "State only",
+      "Next state"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Context-free languages",
+      "Recursive languages",
+      "Regular languages"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Any computational model",
+      "Only context-sensitive grammars",
+      "Only DFA",
+      "Only PDA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Efficiency of algorithms",
+      "Memory management",
+      "Language translation",
+      "Halting problem"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state",
+      "It has a finite grammar"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It accepts regular languages",
+      "It can have non-determinism"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton",
+      "Dual Finite Automaton"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions",
+      "It accepts only context-free languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Both DFA and NFA",
+      "Neither",
+      "DFA only",
+      "NFA only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Input only",
+      "Both state and input",
+      "Previous input"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Input only",
+      "Both state and input",
+      "Next state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Regular languages",
+      "Recursive languages",
+      "Context-sensitive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only DFA",
+      "Only context-sensitive grammars",
+      "Only PDA",
+      "Any computational model"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Halting problem",
+      "Memory management",
+      "Efficiency of algorithms",
+      "Language translation"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have non-determinism",
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It accepts only context-free languages",
+      "It always has a unique transition for each input",
+      "It is equivalent in power to DFA",
+      "It cannot have epsilon transitions"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "Neither",
+      "Both DFA and NFA",
+      "NFA only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Previous input",
+      "Both state and input",
+      "State only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Both state and input",
+      "State only",
+      "Next state"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Regular languages",
+      "Recursive languages",
+      "Context-free languages",
+      "Context-sensitive languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only DFA",
+      "Only PDA",
+      "Any computational model"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Language translation",
+      "Halting problem",
+      "Memory management",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It can be solved using a DFA",
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It accepts regular languages",
+      "It can have epsilon transitions",
+      "It has multiple initial states",
+      "It can have non-determinism"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "Neither",
+      "NFA only",
+      "Both DFA and NFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Previous input",
+      "Both state and input",
+      "State only",
+      "Input only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Next state",
+      "Input only",
+      "State only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Regular languages",
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only PDA",
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Halting problem",
+      "Memory management",
+      "Language translation",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "There exists a Turing Machine that halts on all inputs",
+      "It has a finite grammar",
+      "It has an infinite state",
+      "It can be solved using a DFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It accepts regular languages",
+      "It can have epsilon transitions",
+      "It can have non-determinism"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Discrete Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It always has a unique transition for each input",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Both DFA and NFA",
+      "Neither",
+      "NFA only",
+      "DFA only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Both state and input",
+      "Previous input",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Next state",
+      "State only",
+      "Both state and input"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-free languages",
+      "Recursive languages",
+      "Context-sensitive languages",
+      "Regular languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only PDA",
+      "Only DFA",
+      "Any computational model",
+      "Only context-sensitive grammars"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Halting problem",
+      "Efficiency of algorithms",
+      "Language translation"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "It has a finite grammar",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It accepts regular languages",
+      "It can have non-determinism"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It accepts only context-free languages",
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "NFA only",
+      "Both DFA and NFA",
+      "Neither"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Previous input",
+      "Both state and input",
+      "Input only",
+      "State only"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Next state",
+      "Both state and input",
+      "Input only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-free languages",
+      "Context-sensitive languages",
+      "Regular languages",
+      "Recursive languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Any computational model",
+      "Only DFA",
+      "Only context-sensitive grammars",
+      "Only PDA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Halting problem",
+      "Memory management",
+      "Language translation",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has a finite grammar"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have non-determinism",
+      "It has multiple initial states",
+      "It can have epsilon transitions",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA",
+      "It accepts only context-free languages",
+      "It always has a unique transition for each input"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "Neither",
+      "Both DFA and NFA",
+      "DFA only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Previous input",
+      "State only",
+      "Input only"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "Input only",
+      "Next state",
+      "State only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Recursive languages",
+      "Regular languages",
+      "Context-free languages",
+      "Context-sensitive languages"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only PDA",
+      "Any computational model",
+      "Only DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Efficiency of algorithms",
+      "Halting problem",
+      "Language translation",
+      "Memory management"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has a finite grammar",
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It has multiple initial states",
+      "It accepts regular languages",
+      "It can have epsilon transitions",
+      "It can have non-determinism"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton",
+      "Definite Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It accepts only context-free languages",
+      "It cannot have epsilon transitions",
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "DFA only",
+      "Neither",
+      "NFA only",
+      "Both DFA and NFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Previous input",
+      "Both state and input"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "State only",
+      "Input only",
+      "Next state",
+      "Both state and input"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-free languages",
+      "Regular languages",
+      "Context-sensitive languages",
+      "Recursive languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only context-sensitive grammars",
+      "Only PDA",
+      "Any computational model",
+      "Only DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Memory management",
+      "Language translation",
+      "Halting problem",
+      "Efficiency of algorithms"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "There exists a Turing Machine that halts on all inputs",
+      "It has a finite grammar",
+      "It has an infinite state",
+      "It can be solved using a DFA"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It accepts regular languages",
+      "It can have non-determinism",
+      "It has multiple initial states",
+      "It can have epsilon transitions"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Dual Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It is equivalent in power to DFA",
+      "It accepts only context-free languages",
+      "It always has a unique transition for each input",
+      "It cannot have epsilon transitions"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "NFA only",
+      "Both DFA and NFA",
+      "DFA only",
+      "Neither"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "Input only",
+      "State only",
+      "Both state and input",
+      "Previous input"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Both state and input",
+      "State only",
+      "Next state",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-sensitive languages",
+      "Regular languages",
+      "Recursive languages",
+      "Context-free languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Only PDA",
+      "Only context-sensitive grammars",
+      "Any computational model",
+      "Only DFA"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Efficiency of algorithms",
+      "Language translation",
+      "Memory management",
+      "Halting problem"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It can be solved using a DFA",
+      "There exists a Turing Machine that halts on all inputs",
+      "It has an infinite state",
+      "It has a finite grammar"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "DFA",
+    "question": "Which of the following is true about a DFA?",
+    "options": [
+      "It can have epsilon transitions",
+      "It has multiple initial states",
+      "It can have non-determinism",
+      "It accepts regular languages"
+    ],
+    "correct": 3
+  },
+  {
+    "topic": "DFA",
+    "question": "DFA stands for:",
+    "options": [
+      "Dual Finite Automaton",
+      "Definite Finite Automaton",
+      "Deterministic Finite Automaton",
+      "Discrete Finite Automaton"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Which of the following is true for an NFA?",
+    "options": [
+      "It cannot have epsilon transitions",
+      "It accepts only context-free languages",
+      "It is equivalent in power to DFA",
+      "It always has a unique transition for each input"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "NFA",
+    "question": "Epsilon transitions are allowed in:",
+    "options": [
+      "Both DFA and NFA",
+      "DFA only",
+      "NFA only",
+      "Neither"
+    ],
+    "correct": 2
+  },
+  {
+    "topic": "Moore Machine",
+    "question": "In a Moore machine, the output depends on:",
+    "options": [
+      "State only",
+      "Both state and input",
+      "Previous input",
+      "Input only"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Mealy Machine",
+    "question": "In a Mealy machine, the output depends on:",
+    "options": [
+      "Input only",
+      "Both state and input",
+      "Next state",
+      "State only"
+    ],
+    "correct": 1
+  },
+  {
+    "topic": "PDA",
+    "question": "PDA is used to recognize:",
+    "options": [
+      "Context-free languages",
+      "Context-sensitive languages",
+      "Recursive languages",
+      "Regular languages"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Turing Machine",
+    "question": "A Turing Machine can simulate:",
+    "options": [
+      "Any computational model",
+      "Only DFA",
+      "Only PDA",
+      "Only context-sensitive grammars"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Complexity Theory",
+    "question": "P vs NP problem is concerned with:",
+    "options": [
+      "Efficiency of algorithms",
+      "Memory management",
+      "Halting problem",
+      "Language translation"
+    ],
+    "correct": 0
+  },
+  {
+    "topic": "Computability",
+    "question": "A problem is said to be computable if:",
+    "options": [
+      "It has an infinite state",
+      "There exists a Turing Machine that halts on all inputs",
+      "It can be solved using a DFA",
+      "It has a finite grammar"
+    ],
+    "correct": 1
+  }
+
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answered = false;
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionElement);
+            });
+
+            // Update progress bar
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Reset state
+            selectedAnswer = null;
+            answered = false;
+            document.getElementById('nextBtn').classList.remove('enabled');
+            document.getElementById('feedback').style.display = 'none';
+        }
+
+        function selectAnswer(answerIndex) {
+            if (answered) return;
+
+            selectedAnswer = answerIndex;
+            const options = document.querySelectorAll('.option');
+            const question = questions[currentQuestion];
+            
+            // Remove previous selections
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            // Mark selected answer
+            options[answerIndex].classList.add('selected');
+
+            // Show correct/incorrect feedback
+            answered = true;
+            const feedback = document.getElementById('feedback');
+            
+            if (answerIndex === question.correct) {
+                score++;
+                options[answerIndex].classList.add('correct');
+                feedback.className = 'feedback correct';
+                feedback.textContent = 'Correct! Well done!';
+            } else {
+                options[answerIndex].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `Incorrect. The correct answer is: ${question.options[question.correct]}`;
+            }
+            
+            feedback.style.display = 'block';
+            document.getElementById('nextBtn').classList.add('enabled');
+        }
+
+        function nextQuestion() {
+            if (!answered) return;
+
+            currentQuestion++;
+            
+            if (currentQuestion >= questions.length) {
+                showResults();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            document.getElementById('scoreDetails').textContent = `You got ${score} out of ${questions.length} questions correct!`;
+        }
+
+        function quitQuiz() {
+            if (confirm('Are you sure you want to quit the quiz?')) {
+                currentQuestion = 0;
+                score = 0;
+                loadQuestion();
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('quizContent').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            loadQuestion();
+        }
+
+        // Initialize quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
